@@ -141,6 +141,68 @@ namespace Lab1
             }
         }
 
+        public TValue Search(TKey key)
+        {
+            var hash = GetHash(key);
+
+            if (!Keys.Contains(key))
+            {
+                return default(TValue);
+            }
+
+            if (Items[hash] == null)
+            {
+                foreach (var item in Items)
+                {
+                    if (item.Key.Equals(key))
+                    {
+                        return item.Value;
+                    }
+                }
+
+                return default(TValue);
+            }
+
+            if (Items[hash].Key.Equals(key))
+            {
+                return Items[hash].Value;
+            }
+            else
+            {
+                var placed = false;
+                for (var i = hash; i < size; i++)
+                {
+                    if (Items[i] == null)
+                    {
+                        return default(TValue);
+                    }
+
+                    if (Items[i].Key.Equals(key))
+                    {
+                        return Items[i].Value;
+                    }
+                }
+
+                if (!placed)
+                {
+                    for (var i = 0; i < hash; i++)
+                    {
+                        if (Items[i] == null)
+                        {
+                            return default(TValue);
+                        }
+
+                        if (Items[i].Key.Equals(key))
+                        {
+                            return Items[i].Value;
+                        }
+                    }
+                }
+            }
+
+            return default(TValue);
+        }
+
         public IEnumerator GetEnumerator()
         {
             foreach (var item in Items)

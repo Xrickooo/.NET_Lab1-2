@@ -77,7 +77,13 @@ namespace Dictionary
 
         public IEnumerator GetEnumerator()
         {
-            throw new NotImplementedException();
+            foreach (var item in Items)
+            {
+                if (item != null)
+                {
+                    yield return item;
+                }
+            }
         }
 
         private int GetHash(TKey key)

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections;
+using Lab1;
 
 namespace Lab1
 {

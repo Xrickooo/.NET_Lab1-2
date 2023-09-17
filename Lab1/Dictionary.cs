@@ -1,9 +1,8 @@
 ﻿using Lab1;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 
-namespace Dictionary
+namespace Lab1
 {
     class Dictionary<TKey, TValue> : IEnumerable
     {

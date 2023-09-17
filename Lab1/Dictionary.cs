@@ -75,6 +75,73 @@ namespace Dictionary
             }
         }
 
+        public void Remove(TKey key)
+        {
+            var hash = GetHash(key);
+
+            if (!Keys.Contains(key))
+            {
+                return;
+            }
+
+            if (Items[hash] == null)
+            {
+                for (var i = 0; i < size; i++)
+                {
+                    if (Items[i] != null && Items[i].Key.Equals(key))
+                    {
+                        Items[i] = null;
+                        Keys.Remove(key);
+                        return;
+                    }
+                }
+
+                return;
+            }
+
+            if (Items[hash].Key.Equals(key))
+            {
+                Items[hash] = null;
+                Keys.Remove(key);
+            }
+            else
+            {
+                var placed = false;
+                for (var i = hash; i < size; i++)
+                {
+                    if (Items[i] == null)
+                    {
+                        return;
+                    }
+
+                    if (Items[i].Key.Equals(key))
+                    {
+                        Items[i] = null;
+                        Keys.Remove(key);
+                        return;
+                    }
+                }
+
+                if (!placed)
+                {
+                    for (var i = 0; i < hash; i++)
+                    {
+                        if (Items[i] == null)
+                        {
+                            return;
+                        }
+
+                        if (Items[i].Key.Equals(key))
+                        {
+                            Items[i] = null;
+                            Keys.Remove(key);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
         public IEnumerator GetEnumerator()
         {
             foreach (var item in Items)

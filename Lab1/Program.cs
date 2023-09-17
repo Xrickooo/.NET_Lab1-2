@@ -21,6 +21,24 @@ namespace Lab1
             {
                 Console.WriteLine(item);
             }
+
+            Console.WriteLine(dict.Search(7) ?? "Not Found");
+            Console.WriteLine(dict.Search(3) ?? "Not Found");
+            Console.WriteLine(dict.Search(101) ?? "Not Found");
+
+            dict.Remove(7);
+            dict.Remove(3);
+            dict.Remove(1);
+            dict.Remove(101);
+
+
+            foreach (var item in dict)
+            {
+                Console.WriteLine(item);
+            }
+
+            Console.WriteLine();
+            Console.ReadLine();
         }
     }
 }

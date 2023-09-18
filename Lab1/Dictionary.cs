@@ -10,9 +10,16 @@ namespace Lab1
         private Item<TKey, TValue>[] Items;
         private List<TKey> Keys = new List<TKey>();
 
+        public event Action<TKey, TValue> ItemAdded;
+
+        public event Action<TKey> ItemRemoved;
+
         public Dictionary()
         {
             Items = new Item<TKey, TValue>[size];
+
+            ItemAdded += (key, value) => Console.WriteLine($"Element with key {key} and value {value} added.");
+            ItemRemoved += key => Console.WriteLine($"Element with key {key} is removed.");
         }
 
         public void Add(Item<TKey, TValue> item)
@@ -28,6 +35,7 @@ namespace Lab1
             {
                 Keys.Add(item.Key);
                 Items[hash] = item;
+                ItemAdded?.Invoke(item.Key, item.Value);
             }
             else
             {
@@ -39,6 +47,7 @@ namespace Lab1
                         Keys.Add(item.Key);
                         Items[i] = item;
                         placed = true;
+                        ItemAdded?.Invoke(item.Key, item.Value);
                         break;
                     }
 
@@ -57,6 +66,7 @@ namespace Lab1
                             Keys.Add(item.Key);
                             Items[i] = item;
                             placed = true;
+                            ItemAdded?.Invoke(item.Key, item.Value);
                             break;
                         }
 
@@ -91,6 +101,7 @@ namespace Lab1
                     {
                         Items[i] = null;
                         Keys.Remove(key);
+                        ItemRemoved?.Invoke(key);
                         return;
                     }
                 }
@@ -102,6 +113,7 @@ namespace Lab1
             {
                 Items[hash] = null;
                 Keys.Remove(key);
+                ItemRemoved?.Invoke(key);
             }
             else
             {
@@ -117,6 +129,7 @@ namespace Lab1
                     {
                         Items[i] = null;
                         Keys.Remove(key);
+                        ItemRemoved?.Invoke(key);
                         return;
                     }
                 }
@@ -134,6 +147,7 @@ namespace Lab1
                         {
                             Items[i] = null;
                             Keys.Remove(key);
+                            ItemRemoved?.Invoke(key);
                             return;
                         }
                     }

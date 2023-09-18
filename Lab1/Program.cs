@@ -37,6 +37,8 @@ namespace Lab1
                 Console.WriteLine(item);
             }
 
+            dict.Clear();
+
             Console.WriteLine();
             Console.ReadLine();
         }

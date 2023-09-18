@@ -14,12 +14,15 @@ namespace Lab1
 
         public event Action<TKey> ItemRemoved;
 
+        public event Action DictionaryCleared;
+
         public Dictionary()
         {
             Items = new Item<TKey, TValue>[size];
 
             ItemAdded += (key, value) => Console.WriteLine($"Element with key {key} and value {value} added.");
             ItemRemoved += key => Console.WriteLine($"Element with key {key} is removed.");
+            DictionaryCleared += () => Console.WriteLine("Dictionary is cleared."); 
         }
 
         public void Add(Item<TKey, TValue> item)
@@ -231,6 +234,18 @@ namespace Lab1
         private int GetHash(TKey key)
         {
             return key.GetHashCode() % size;
+        }
+
+        public void Clear()
+        {
+            var keysCopy = new List<TKey>(Keys); // Створюємо копію списку ключів
+
+            foreach (var key in keysCopy)
+            {
+                Remove(key); // Видаляємо ключі зі словника
+            }
+
+            DictionaryCleared?.Invoke();
         }
     }
 }

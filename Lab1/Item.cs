@@ -3,7 +3,7 @@ using Lab1;
 
 namespace Lab1
 {
-    class Item<TKey, TValue>
+    public class Item<TKey, TValue>
     {
         public TKey Key { get; set; }
         public TValue Value { get; set; }

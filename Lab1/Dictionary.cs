@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace Lab1
 {
-    class Dictionary<TKey, TValue> : IEnumerable
+    public class MyDictionary<TKey, TValue> : IEnumerable
     {
         private int size = 100;
         private Item<TKey, TValue>[] Items;
@@ -16,7 +16,7 @@ namespace Lab1
 
         public event Action DictionaryCleared;
 
-        public Dictionary()
+        public MyDictionary()
         {
             Items = new Item<TKey, TValue>[size];
 

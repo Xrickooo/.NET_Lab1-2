@@ -3,11 +3,11 @@ using System;
 
 namespace Lab1
 {
-    internal class Program
+    public class Program
     {
         static void Main(string[] args)
         {
-            var dict = new Dictionary<int, string>();
+            var dict = new MyDictionary<int, string>();
             dict.TryAdd(new Item<int, string>(1, "One"));
             dict.Add(new Item<int, string>(1, "One"));
             dict.Add(new Item<int, string>(2, "Two"));

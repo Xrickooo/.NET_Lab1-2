@@ -8,7 +8,7 @@ namespace Lab1
         static void Main(string[] args)
         {
             var dict = new MyDictionary<int, string>();
-            dict.TryAdd(new Item<int, string>(1, "One"));
+            Console.WriteLine(dict.TryAdd(new Item<int, string>(1, "One")));
             dict.Add(new Item<int, string>(1, "One"));
             dict.Add(new Item<int, string>(2, "Two"));
             dict.Add(new Item<int, string>(3, "Three"));

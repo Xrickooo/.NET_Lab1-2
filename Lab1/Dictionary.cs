@@ -163,7 +163,7 @@ namespace Lab1
             var hash = GetHash(key);
 
             if (!Keys.Contains(key))
-            {
+            {;
                 return default(TValue);
             }
 
@@ -220,6 +220,99 @@ namespace Lab1
             return default(TValue);
         }
 
+        public bool ContainsKey(TKey key)
+        {
+            foreach (var existingKey in Keys)
+            {
+                if (existingKey.Equals(key))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool ContainsValue(TValue value)
+        {
+            foreach (var item in Items)
+            {
+                if (item != null && item.Value.Equals(value))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool TryGetValue(TKey key, out TValue value)
+        {
+            var hash = GetHash(key);
+
+            if (Keys.Contains(key))
+            {
+                if (Items[hash] == null)
+                {
+                    foreach (var item in Items)
+                    {
+                        if (item != null && item.Key.Equals(key))
+                        {
+                            value = item.Value;
+                            return true;
+                        }
+                    }
+                }
+                else if (Items[hash].Key.Equals(key))
+                {
+                    value = Items[hash].Value;
+                    return true;
+                }
+                else
+                {
+                    for (var i = hash; i < size; i++)
+                    {
+                        if (Items[i] == null)
+                        {
+                            break;
+                        }
+
+                        if (Items[i].Key.Equals(key))
+                        {
+                            value = Items[i].Value;
+                            return true;
+                        }
+                    }
+
+                    for (var i = 0; i < hash; i++)
+                    {
+                        if (Items[i] == null)
+                        {
+                            break;
+                        }
+
+                        if (Items[i].Key.Equals(key))
+                        {
+                            value = Items[i].Value;
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            value = default(TValue);
+            return false;
+        }
+
+        public bool TryAdd(Item<TKey, TValue> item)
+        {
+            if (!Keys.Contains(item.Key))
+            {
+                Add(item);
+                return true;
+            }
+
+            return false;
+        }
+
         public IEnumerator GetEnumerator()
         {
             foreach (var item in Items)
@@ -238,11 +331,11 @@ namespace Lab1
 
         public void Clear()
         {
-            var keysCopy = new List<TKey>(Keys); // Створюємо копію списку ключів
+            var keysCopy = new List<TKey>(Keys); 
 
             foreach (var key in keysCopy)
             {
-                Remove(key); // Видаляємо ключі зі словника
+                Remove(key); 
             }
 
             DictionaryCleared?.Invoke();

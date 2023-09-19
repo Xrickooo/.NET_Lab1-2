@@ -8,7 +8,7 @@ namespace Lab1
         static void Main(string[] args)
         {
             var dict = new Dictionary<int, string>();
-            dict.Add(new Item<int, string>(1, "One"));
+            dict.TryAdd(new Item<int, string>(1, "One"));
             dict.Add(new Item<int, string>(1, "One"));
             dict.Add(new Item<int, string>(2, "Two"));
             dict.Add(new Item<int, string>(3, "Three"));
@@ -16,21 +16,19 @@ namespace Lab1
             dict.Add(new Item<int, string>(5, "Five"));
             dict.Add(new Item<int, string>(101, "One hundred and one"));
 
-
             foreach (var item in dict)
             {
                 Console.WriteLine(item);
             }
 
-            Console.WriteLine(dict.Search(7) ?? "Not Found");
-            Console.WriteLine(dict.Search(3) ?? "Not Found");
-            Console.WriteLine(dict.Search(101) ?? "Not Found");
+            Console.WriteLine(dict.Search(7));
+            Console.WriteLine(dict.Search(3));
+            Console.WriteLine(dict.Search(101));
 
             dict.Remove(7);
             dict.Remove(3);
             dict.Remove(1);
             dict.Remove(101);
-
 
             foreach (var item in dict)
             {

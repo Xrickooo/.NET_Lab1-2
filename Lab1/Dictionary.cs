@@ -1,60 +1,149 @@
-﻿using Lab1;
-using System;
+﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Lab1
 {
-    public class MyDictionary<TKey, TValue> : IEnumerable
+    public class MyDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     {
-        private int size = 100;
-        private Item<TKey, TValue>[] Items;
-        private List<TKey> Keys = new List<TKey>();
+        private readonly int _size = 100;
+        private readonly Item<TKey, TValue>[] _items;
+        private readonly List<TKey> _keys = new List<TKey>();
 
         public event Action<TKey, TValue> ItemAdded;
-
         public event Action<TKey> ItemRemoved;
-
         public event Action DictionaryCleared;
+
+        public void SubscribeToEvents()
+        {
+            ItemAdded += (key, value) => Console.WriteLine($"Element with key {key} and value {value} added.");
+            ItemRemoved += key => Console.WriteLine($"Element with key {key} is removed.");
+            DictionaryCleared += () => Console.WriteLine("Dictionary is cleared.");
+        }
 
         public MyDictionary()
         {
-            Items = new Item<TKey, TValue>[size];
-
-            ItemAdded += (key, value) => Console.WriteLine($"Element with key {key} and value {value} added.");
-            ItemRemoved += key => Console.WriteLine($"Element with key {key} is removed.");
-            DictionaryCleared += () => Console.WriteLine("Dictionary is cleared."); 
+            _items = new Item<TKey, TValue>[_size];
+            SubscribeToEvents();
         }
 
-        public void Add(Item<TKey, TValue> item)
+        public TValue this[TKey key]
         {
-            var hash = GetHash(item.Key);
-
-            if (Keys.Contains(item.Key))
+            get => Search(key);
+            set
             {
-                return;
+                Add(key, value);
+                ItemAdded?.Invoke(key, value);
+            }
+        }
+
+        public ICollection<TKey> Keys => _keys;
+
+        public ICollection<TValue> Values
+        {
+            get
+            {
+                List<TValue> values = new List<TValue>();
+                foreach (var item in _items)
+                {
+                    if (item != null)
+                    {
+                        values.Add(item.Value);
+                    }
+                }
+                return values;
+            }
+        }
+
+        public int Count => _keys.Count;
+
+        public bool IsReadOnly => false;
+
+        public TValue Search(TKey key)
+        {
+            var hash = GetHash(key);
+
+            if (_keys.Contains(key))
+            {
+                if (_items[hash] == null)
+                {
+                    foreach (var item in _items)
+                    {
+                        if (item != null && item.Key.Equals(key))
+                        {
+                            return item.Value;
+                        }
+                    }
+                }
+                else if (_items[hash].Key.Equals(key))
+                {
+                    return _items[hash].Value;
+                }
+                else
+                {
+                    var placed = false;
+                    for (var i = hash; i < _size; i++)
+                    {
+                        if (_items[i] == null)
+                        {
+                            break;
+                        }
+
+                        if (_items[i].Key.Equals(key))
+                        {
+                            return _items[i].Value;
+                        }
+                    }
+
+                    for (var i = 0; i < hash; i++)
+                    {
+                        if (_items[i] == null)
+                        {
+                            break;
+                        }
+
+                        if (_items[i].Key.Equals(key))
+                        {
+                            return _items[i].Value;
+                        }
+                    }
+                }
             }
 
-            if (Items[hash] == null)
+            throw new KeyNotFoundException($"Key '{key}' not found in the dictionary.");
+        }
+
+
+        public void Add(TKey key, TValue value)
+        {
+            var hash = GetHash(key);
+
+            if (_keys.Contains(key))
             {
-                Keys.Add(item.Key);
-                Items[hash] = item;
-                ItemAdded?.Invoke(item.Key, item.Value);
+                throw new ArgumentException($"Key '{key}' already exists in the dictionary.");
+            }
+            if (_items[hash] == null)
+            {
+                _keys.Add(key);
+                _items[hash] = new Item<TKey, TValue> { Key = key, Value = value };
+                ItemAdded?.Invoke(key, value);
             }
             else
             {
                 var placed = false;
-                for (var i = hash; i < size; i++)
+                for (var i = hash; i < _size; i++)
                 {
-                    if (Items[i] == null)
+                    if (_items[i] == null)
                     {
-                        Keys.Add(item.Key);
-                        Items[i] = item;
+                        _keys.Add(key);
+                        _items[i] = new Item<TKey, TValue> { Key = key, Value = value };
                         placed = true;
-                        ItemAdded?.Invoke(item.Key, item.Value);
+                        ItemAdded?.Invoke(key, value);
                         break;
                     }
 
-                    if (Items[i].Key.Equals(item.Key))
+                    if (_items[i].Key.Equals(key))
                     {
                         return;
                     }
@@ -64,16 +153,16 @@ namespace Lab1
                 {
                     for (var i = 0; i < hash; i++)
                     {
-                        if (Items[i] == null)
+                        if (_items[i] == null)
                         {
-                            Keys.Add(item.Key);
-                            Items[i] = item;
+                            _keys.Add(key);
+                            _items[i] = new Item<TKey, TValue> { Key = key, Value = value };
                             placed = true;
-                            ItemAdded?.Invoke(item.Key, item.Value);
+                            ItemAdded?.Invoke(key, value);
                             break;
                         }
 
-                        if (Items[i].Key.Equals(item.Key))
+                        if (_items[i].Key.Equals(key))
                         {
                             return;
                         }
@@ -87,53 +176,53 @@ namespace Lab1
             }
         }
 
-        public void Remove(TKey key)
+        public bool Remove(TKey key)
         {
             var hash = GetHash(key);
 
-            if (!Keys.Contains(key))
+            if (!_keys.Contains(key))
             {
-                return;
+                throw new InvalidOperationException($"$Key '{key}' not found.");
             }
-
-            if (Items[hash] == null)
+            if (_items[hash] == null)
             {
-                for (var i = 0; i < size; i++)
+                for (var i = 0; i < _size; i++)
                 {
-                    if (Items[i] != null && Items[i].Key.Equals(key))
+                    if (_items[i] != null && _items[i].Key.Equals(key))
                     {
-                        Items[i] = null;
-                        Keys.Remove(key);
+                        _items[i] = null;
+                        _keys.Remove(key);
                         ItemRemoved?.Invoke(key);
-                        return;
+                        return true;
                     }
                 }
 
-                return;
+                throw new InvalidOperationException($"$Key '{key}' not found.");
             }
 
-            if (Items[hash].Key.Equals(key))
+            if (_items[hash].Key.Equals(key))
             {
-                Items[hash] = null;
-                Keys.Remove(key);
+                _items[hash] = null;
+                _keys.Remove(key);
                 ItemRemoved?.Invoke(key);
+                return true;
             }
             else
             {
                 var placed = false;
-                for (var i = hash; i < size; i++)
+                for (var i = hash; i < _size; i++)
                 {
-                    if (Items[i] == null)
+                    if (_items[i] == null)
                     {
-                        return;
+                        throw new InvalidOperationException($"$Key '{key}' not found.");
                     }
 
-                    if (Items[i].Key.Equals(key))
+                    if (_items[i].Key.Equals(key))
                     {
-                        Items[i] = null;
-                        Keys.Remove(key);
+                        _items[i] = null;
+                        _keys.Remove(key);
                         ItemRemoved?.Invoke(key);
-                        return;
+                        return true;
                     }
                 }
 
@@ -141,204 +230,226 @@ namespace Lab1
                 {
                     for (var i = 0; i < hash; i++)
                     {
-                        if (Items[i] == null)
+                        if (_items[i] == null)
                         {
-                            return;
+                            throw new InvalidOperationException($"$Key '{key}' not found.");
                         }
 
-                        if (Items[i].Key.Equals(key))
+                        if (_items[i].Key.Equals(key))
                         {
-                            Items[i] = null;
-                            Keys.Remove(key);
+                            _items[i] = null;
+                            _keys.Remove(key);
                             ItemRemoved?.Invoke(key);
-                            return;
+                            return true;
                         }
                     }
                 }
+
+                throw new InvalidOperationException($"$Key '{key}' not found.");
             }
         }
 
-        public TValue Search(TKey key)
-        {
-            var hash = GetHash(key);
-
-            if (!Keys.Contains(key))
-            {;
-                return default(TValue);
-            }
-
-            if (Items[hash] == null)
-            {
-                foreach (var item in Items)
-                {
-                    if (item.Key.Equals(key))
-                    {
-                        return item.Value;
-                    }
-                }
-
-                return default(TValue);
-            }
-
-            if (Items[hash].Key.Equals(key))
-            {
-                return Items[hash].Value;
-            }
-            else
-            {
-                var placed = false;
-                for (var i = hash; i < size; i++)
-                {
-                    if (Items[i] == null)
-                    {
-                        return default(TValue);
-                    }
-
-                    if (Items[i].Key.Equals(key))
-                    {
-                        return Items[i].Value;
-                    }
-                }
-
-                if (!placed)
-                {
-                    for (var i = 0; i < hash; i++)
-                    {
-                        if (Items[i] == null)
-                        {
-                            return default(TValue);
-                        }
-
-                        if (Items[i].Key.Equals(key))
-                        {
-                            return Items[i].Value;
-                        }
-                    }
-                }
-            }
-
-            return default(TValue);
-        }
-
-        public bool ContainsKey(TKey key)
-        {
-            foreach (var existingKey in Keys)
-            {
-                if (existingKey.Equals(key))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public bool ContainsValue(TValue value)
-        {
-            foreach (var item in Items)
-            {
-                if (item != null && item.Value.Equals(value))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
 
         public bool TryGetValue(TKey key, out TValue value)
         {
+            value = default(TValue);
+
             var hash = GetHash(key);
 
-            if (Keys.Contains(key))
+            if (!_keys.Contains(key))
             {
-                if (Items[hash] == null)
+                throw new InvalidOperationException($"$Key '{key}' not found.");
+            }
+            if (_items[hash] == null)
+            {
+                foreach (var item in _items)
                 {
-                    foreach (var item in Items)
+                    if (item != null && item.Key.Equals(key))
                     {
-                        if (item != null && item.Key.Equals(key))
-                        {
-                            value = item.Value;
-                            return true;
-                        }
+                        value = item.Value;
+                        return true;
                     }
                 }
-                else if (Items[hash].Key.Equals(key))
-                {
-                    value = Items[hash].Value;
-                    return true;
-                }
-                else
-                {
-                    for (var i = hash; i < size; i++)
-                    {
-                        if (Items[i] == null)
-                        {
-                            break;
-                        }
 
-                        if (Items[i].Key.Equals(key))
-                        {
-                            value = Items[i].Value;
-                            return true;
-                        }
-                    }
-
-                    for (var i = 0; i < hash; i++)
-                    {
-                        if (Items[i] == null)
-                        {
-                            break;
-                        }
-
-                        if (Items[i].Key.Equals(key))
-                        {
-                            value = Items[i].Value;
-                            return true;
-                        }
-                    }
-                }
+                throw new InvalidOperationException($"$Key '{key}' not found.");
             }
 
-            value = default(TValue);
-            return false;
-        }
-
-        public bool TryAdd(Item<TKey, TValue> item)
-        {
-            if (!Keys.Contains(item.Key))
+            if (_items[hash].Key.Equals(key))
             {
-                Add(item);
+                value = _items[hash].Value;
                 return true;
             }
-
-            return false;
-        }
-
-        public IEnumerator GetEnumerator()
-        {
-            foreach (var item in Items)
+            else
             {
-                if (item != null)
+                var placed = false;
+                for (var i = hash; i < _size; i++)
                 {
-                    yield return item;
+                    if (_items[i] == null)
+                    {
+                        throw new InvalidOperationException($"$Key '{key}' not found.");
+                    }
+
+                    if (_items[i].Key.Equals(key))
+                    {
+                        value = _items[i].Value;
+                        return true;
+                    }
+                }
+
+                if (!placed)
+                {
+                    for (var i = 0; i < hash; i++)
+                    {
+                        if (_items[i] == null)
+                        {
+                            throw new InvalidOperationException($"$Key '{key}' not found.");
+                        }
+
+                        if (_items[i].Key.Equals(key))
+                        {
+                            value = _items[i].Value;
+                            return true;
+                        }
+                    }
                 }
             }
+
+            throw new InvalidOperationException($"$Key '{key}' not found.");
         }
+
 
         private int GetHash(TKey key)
         {
-            return key.GetHashCode() % size;
+            return key.GetHashCode() % _size;
         }
 
         public void Clear()
         {
-            var keysCopy = new List<TKey>(Keys); 
+            var keysCopy = new List<TKey>(Keys);
 
             foreach (var key in keysCopy)
             {
-                Remove(key); 
+                Remove(key);
             }
 
             DictionaryCleared?.Invoke();
         }
+
+        public bool ContainsKey(TKey key)
+        {
+            foreach (var item in _items)
+            {
+                if (item != null && item.Key.Equals(key))
+                {
+                    return true;
+                }
+            }
+
+            throw new KeyNotFoundException($"$Key '{key}' not found.");
+        }
+
+        public bool ContainsValue(TValue value)
+        {
+            foreach (var item in _items)
+            {
+                if (item != null && EqualityComparer<TValue>.Default.Equals(item.Value, value))
+                {
+                    return true;
+                }
+            }
+
+            throw new Exception($"Value '{value}' not found.");
+        }
+
+        public void TryAdd(Item<TKey, TValue> item)
+        {
+            if (_keys.Contains(item.Key))
+            {
+                throw new InvalidOperationException($"Key '{item.Key}' already exists.");
+            }
+
+            Add(item.Key, item.Value);
+        }
+
+        public void Add(KeyValuePair<TKey, TValue> item)
+        {
+            Add(item.Key, item.Value);
+        }
+
+        public bool Remove(KeyValuePair<TKey, TValue> item)
+        {
+            if (_keys.Contains(item.Key))
+            {
+                Remove(item.Key);
+                return true;
+            }
+            else
+            {
+                throw new Exception("Item not found.");
+            }
+        }
+
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+        {
+            foreach (var key in _keys)
+            {
+                var hash = GetHash(key);
+                yield return new KeyValuePair<TKey, TValue>(key, _items[hash].Value);
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public bool Contains(KeyValuePair<TKey, TValue> item)
+        {
+            foreach (var key in _keys)
+            {
+                var hash = GetHash(key);
+                var currentItem = _items[hash];
+
+                if (currentItem != null && currentItem.Key.Equals(item.Key) && EqualityComparer<TValue>.Default.Equals(currentItem.Value, item.Value))
+                {
+                    return true;
+                }
+            }
+
+            throw new Exception("Item not found.");
+        }
+
+        public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
+        {
+            if (array == null)
+            {
+                throw new ArgumentNullException(nameof(array));
+            }
+
+            if (arrayIndex < 0 || arrayIndex >= array.Length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(arrayIndex));
+            }
+
+            if (array.Length - arrayIndex < _keys.Count)
+            {
+                throw new ArgumentException("The destination array is not large enough.");
+            }
+
+            int i = arrayIndex;
+            foreach (var key in _keys)
+            {
+                var hash = GetHash(key);
+                var currentItem = _items[hash];
+
+                if (currentItem != null)
+                {
+                    array[i++] = new KeyValuePair<TKey, TValue>(currentItem.Key, currentItem.Value);
+                }
+            }
+        }
+
     }
 }
+
+

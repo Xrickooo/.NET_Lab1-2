@@ -14,6 +14,8 @@ namespace Lab1
             Value = value;
         }
 
+        public Item(){}
+
         public override int GetHashCode()
         {
             return Key.GetHashCode();
@@ -24,5 +26,10 @@ namespace Lab1
             return Value.ToString();
         }
 
+        public override bool Equals(object? obj)
+        {
+            return base.Equals(obj);
+        }
+        
     }
 }

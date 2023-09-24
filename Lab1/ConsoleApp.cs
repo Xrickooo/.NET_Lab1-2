@@ -6,11 +6,11 @@ namespace Lab1
 {
     public class ConsoleApp
     {
-        private MyDictionary<int, string> dict;
+        private MyDictionary<int, string> _dict;
 
         public ConsoleApp()
         {
-            dict = new MyDictionary<int, string>();
+            _dict = new MyDictionary<int, string>();
         }
 
         public void Run()
@@ -43,7 +43,7 @@ namespace Lab1
                             {
                                 Console.Write("Enter Value (string): ");
                                 string value = Console.ReadLine();
-                                dict.Add(key, value);
+                                _dict.Add(key, value);
                                 Console.WriteLine("\nKey-Value pair added successfully.");
                             }
                             else
@@ -59,7 +59,7 @@ namespace Lab1
                             Console.Write("Enter Key to search for: ");
                             if (int.TryParse(Console.ReadLine(), out int searchKey))
                             {
-                                string result = dict.Search(searchKey);
+                                string result = _dict.Search(searchKey);
                                 Console.WriteLine($"\nSearch result: {result}");
                             }
                             else
@@ -75,7 +75,7 @@ namespace Lab1
                             Console.Write("Enter Key to remove: ");
                             if (int.TryParse(Console.ReadLine(), out int removeKey))
                             {
-                                bool removed = dict.Remove(removeKey);
+                                bool removed = _dict.Remove(removeKey);
                                 if (removed)
                                 {
                                     Console.WriteLine("\nKey-Value pair removed successfully.");
@@ -95,7 +95,7 @@ namespace Lab1
                             Console.Clear();
                             Console.WriteLine("All Key-Value Pairs");
                             Console.WriteLine("===================");
-                            foreach (var item in dict)
+                            foreach (var item in _dict)
                             {
                                 Console.WriteLine($"Key: {item.Key}, Value: {item.Value}");
                             }
@@ -105,7 +105,7 @@ namespace Lab1
                             Console.Clear();
                             Console.WriteLine("Clear Dictionary");
                             Console.WriteLine("================");
-                            dict.Clear();
+                            _dict.Clear();
                             Console.WriteLine("\nDictionary cleared.");
                             break;
 

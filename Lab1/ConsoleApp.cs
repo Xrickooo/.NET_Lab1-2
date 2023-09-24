@@ -6,7 +6,7 @@ namespace Lab1
 {
     public class ConsoleApp
     {
-        private MyDictionary<int, string> _dict;
+        private readonly MyDictionary<int, string> _dict;
 
         public ConsoleApp()
         {

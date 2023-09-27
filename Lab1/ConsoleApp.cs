@@ -44,7 +44,6 @@ namespace Lab1
                                 Console.Write("Enter Value (string): ");
                                 string value = Console.ReadLine();
                                 _dict.Add(key, value);
-                                Console.WriteLine("\nKey-Value pair added successfully.");
                             }
                             else
                             {
@@ -76,11 +75,7 @@ namespace Lab1
                             if (int.TryParse(Console.ReadLine(), out int removeKey))
                             {
                                 bool removed = _dict.Remove(removeKey);
-                                if (removed)
-                                {
-                                    Console.WriteLine("\nKey-Value pair removed successfully.");
-                                }
-                                else
+                                if (!removed)
                                 {
                                     Console.WriteLine("\nKey not found in the dictionary.");
                                 }
@@ -106,7 +101,6 @@ namespace Lab1
                             Console.WriteLine("Clear Dictionary");
                             Console.WriteLine("================");
                             _dict.Clear();
-                            Console.WriteLine("\nDictionary cleared.");
                             break;
 
                         case 6:

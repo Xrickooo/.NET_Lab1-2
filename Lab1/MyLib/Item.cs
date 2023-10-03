@@ -1,7 +1,6 @@
 ﻿using System;
-using Lab1;
 
-namespace Lab1
+namespace Lab1.MyLib
 {
     public class Item<TKey, TValue>
     {
@@ -14,7 +13,7 @@ namespace Lab1
             Value = value;
         }
 
-        public Item(){}
+        public Item() { }
 
         public override int GetHashCode()
         {
@@ -30,6 +29,6 @@ namespace Lab1
         {
             return base.Equals(obj);
         }
-        
+
     }
 }

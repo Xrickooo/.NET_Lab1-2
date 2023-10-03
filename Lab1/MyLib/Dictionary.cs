@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Lab1
+namespace Lab1.MyLib
 {
     public class MyDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     {
@@ -252,7 +252,7 @@ namespace Lab1
 
         public bool TryGetValue(TKey key, out TValue value)
         {
-            value = default(TValue);
+            value = default;
 
             var hash = GetHash(key);
 

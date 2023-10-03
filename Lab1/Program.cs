@@ -1,6 +1,7 @@
 ﻿using Lab1;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Lab1
 {

@@ -1,4 +1,4 @@
-﻿using Lab1;
+﻿using Lab1.MyLib;
 using System;
 using System.Collections.Generic;
 

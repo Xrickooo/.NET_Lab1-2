@@ -6,11 +6,18 @@ namespace Lab1
 {
     public class ConsoleApp
     {
+        void Added(int key, string value) => Console.WriteLine($"Element was added.");
+        void Removed(int key) => Console.WriteLine($"Element was removed.");
+        void Cleared() => Console.WriteLine("Dictionary is cleared.");
+
         private readonly MyDictionary<int, string> _dict;
 
         public ConsoleApp()
         {
             _dict = new MyDictionary<int, string>();
+            _dict.OnItemAdded += Added;
+            _dict.OnItemRemoved += Removed;
+            _dict.OnDictionaryCleared += Cleared;
         }
 
         public void Run()

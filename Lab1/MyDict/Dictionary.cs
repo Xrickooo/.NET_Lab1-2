@@ -11,21 +11,13 @@ namespace Lab1.MyLib
         private readonly Item<TKey, TValue>[] _items;
         private readonly List<TKey> _keys = new List<TKey>();
 
-        public event Action<TKey, TValue> ItemAdded;
-        public event Action<TKey> ItemRemoved;
-        public event Action DictionaryCleared;
-
-        public void SubscribeToEvents()
-        {
-            ItemAdded += (key, value) => Console.WriteLine($"Element with key {key} and value {value} added.");
-            ItemRemoved += key => Console.WriteLine($"Element with key {key} is removed.");
-            DictionaryCleared += () => Console.WriteLine("Dictionary is cleared.");
-        }
+        public event Action<TKey, TValue>? OnItemAdded;
+        public event Action<TKey>? OnItemRemoved;
+        public event Action? OnDictionaryCleared;
 
         public MyDictionary()
         {
             _items = new Item<TKey, TValue>[_size];
-            SubscribeToEvents();
         }
 
         public TValue this[TKey key]
@@ -34,7 +26,7 @@ namespace Lab1.MyLib
             set
             {
                 Add(key, value);
-                ItemAdded?.Invoke(key, value);
+                OnItemAdded?.Invoke(key, value);
             }
         }
 
@@ -127,7 +119,7 @@ namespace Lab1.MyLib
             {
                 _keys.Add(key);
                 _items[hash] = new Item<TKey, TValue> { Key = key, Value = value };
-                ItemAdded?.Invoke(key, value);
+                OnItemAdded?.Invoke(key, value);
             }
             else
             {
@@ -139,7 +131,7 @@ namespace Lab1.MyLib
                         _keys.Add(key);
                         _items[i] = new Item<TKey, TValue> { Key = key, Value = value };
                         placed = true;
-                        ItemAdded?.Invoke(key, value);
+                        OnItemAdded?.Invoke(key, value);
                         break;
                     }
 
@@ -158,7 +150,7 @@ namespace Lab1.MyLib
                             _keys.Add(key);
                             _items[i] = new Item<TKey, TValue> { Key = key, Value = value };
                             placed = true;
-                            ItemAdded?.Invoke(key, value);
+                            OnItemAdded?.Invoke(key, value);
                             break;
                         }
 
@@ -192,7 +184,7 @@ namespace Lab1.MyLib
                     {
                         _items[i] = null;
                         _keys.Remove(key);
-                        ItemRemoved?.Invoke(key);
+                        OnItemRemoved?.Invoke(key);
                         return true;
                     }
                 }
@@ -204,7 +196,7 @@ namespace Lab1.MyLib
             {
                 _items[hash] = null;
                 _keys.Remove(key);
-                ItemRemoved?.Invoke(key);
+                OnItemRemoved?.Invoke(key);
                 return true;
             }
             else
@@ -221,7 +213,7 @@ namespace Lab1.MyLib
                     {
                         _items[i] = null;
                         _keys.Remove(key);
-                        ItemRemoved?.Invoke(key);
+                        OnItemRemoved?.Invoke(key);
                         return true;
                     }
                 }
@@ -239,7 +231,7 @@ namespace Lab1.MyLib
                         {
                             _items[i] = null;
                             _keys.Remove(key);
-                            ItemRemoved?.Invoke(key);
+                            OnItemRemoved?.Invoke(key);
                             return true;
                         }
                     }
@@ -332,7 +324,7 @@ namespace Lab1.MyLib
                 Remove(key);
             }
 
-            DictionaryCleared?.Invoke();
+            OnDictionaryCleared?.Invoke();
         }
 
         public bool ContainsKey(TKey key)

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Lab1.MyLib
+namespace Lab1.MyDict
 {
     public class MyDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     {

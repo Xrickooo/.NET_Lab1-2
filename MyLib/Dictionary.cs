@@ -13,9 +13,9 @@ namespace MyLib
         private readonly Item<TKey, TValue>[] _items;
         private readonly List<TKey> _keys = new List<TKey>();
 
-        public event Action<TKey, TValue>? OnItemAdded;
-        public event Action<TKey>? OnItemRemoved;
-        public event Action? OnDictionaryCleared;
+        public event Action<TKey, TValue> OnItemAdded;
+        public event Action<TKey> OnItemRemoved;
+        public event Action OnDictionaryCleared;
 
         public MyDictionary()
         {

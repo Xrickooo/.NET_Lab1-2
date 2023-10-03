@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lab1.MyLib
+namespace Lab1.MyDict
 {
     public class Item<TKey, TValue>
     {

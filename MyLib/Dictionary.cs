@@ -56,51 +56,15 @@ namespace MyLib
 
         public TValue Search(TKey key)
         {
-            var hash = GetHash(key);
-
             if (_keys.Contains(key))
             {
-                if (_items[hash] == null)
+                var hash = GetHash(key);
+                for (var i = 0; i < _size; i++)
                 {
-                    foreach (var item in _items)
+                    var index = (hash + i) % _size;
+                    if (_items[index] != null && _items[index].Key.Equals(key))
                     {
-                        if (item != null && item.Key.Equals(key))
-                        {
-                            return item.Value;
-                        }
-                    }
-                }
-                else if (_items[hash].Key.Equals(key))
-                {
-                    return _items[hash].Value;
-                }
-                else
-                {
-                    var placed = false;
-                    for (var i = hash; i < _size; i++)
-                    {
-                        if (_items[i] == null)
-                        {
-                            break;
-                        }
-
-                        if (_items[i].Key.Equals(key))
-                        {
-                            return _items[i].Value;
-                        }
-                    }
-
-                    for (var i = 0; i < hash; i++)
-                    {
-                        if (_items[i] == null)
-                        {
-                            break;
-                        }
-
-                        if (_items[i].Key.Equals(key))
-                        {
-                            return _items[i].Value;
-                        }
+                        return _items[index].Value;
                     }
                 }
             }
@@ -109,66 +73,37 @@ namespace MyLib
         }
 
 
+
         public void Add(TKey key, TValue value)
         {
             var hash = GetHash(key);
+
+            if (hash < 0)
+            {
+                throw new ArgumentException($"Hash value for key '{key}' is less than 0.");
+            }
 
             if (_keys.Contains(key))
             {
                 throw new ArgumentException($"Key '{key}' already exists in the dictionary.");
             }
-            if (_items[hash] == null)
+
+            int index = hash;
+            while (_items[index] != null)
             {
-                _keys.Add(key);
-                _items[hash] = new Item<TKey, TValue> { Key = key, Value = value };
-                OnItemAdded?.Invoke(key, value);
-            }
-            else
-            {
-                var placed = false;
-                for (var i = hash; i < _size; i++)
-                {
-                    if (_items[i] == null)
-                    {
-                        _keys.Add(key);
-                        _items[i] = new Item<TKey, TValue> { Key = key, Value = value };
-                        placed = true;
-                        OnItemAdded?.Invoke(key, value);
-                        break;
-                    }
-
-                    if (_items[i].Key.Equals(key))
-                    {
-                        return;
-                    }
-                }
-
-                if (!placed)
-                {
-                    for (var i = 0; i < hash; i++)
-                    {
-                        if (_items[i] == null)
-                        {
-                            _keys.Add(key);
-                            _items[i] = new Item<TKey, TValue> { Key = key, Value = value };
-                            placed = true;
-                            OnItemAdded?.Invoke(key, value);
-                            break;
-                        }
-
-                        if (_items[i].Key.Equals(key))
-                        {
-                            return;
-                        }
-                    }
-                }
-
-                if (!placed)
+                index = (index + 1) % _size;
+                if (index == hash)
                 {
                     throw new Exception("Out of dictionary range");
                 }
             }
+
+            _keys.Add(key);
+            _items[index] = new Item<TKey, TValue> { Key = key, Value = value };
+            OnItemAdded?.Invoke(key, value);
         }
+
+
 
         public bool Remove(TKey key)
         {
@@ -176,72 +111,24 @@ namespace MyLib
 
             if (!_keys.Contains(key))
             {
-                throw new InvalidOperationException($"$Key '{key}' not found.");
+                throw new InvalidOperationException($"Key '{key}' not found.");
             }
-            if (_items[hash] == null)
+
+            for (var i = 0; i < _size; i++)
             {
-                for (var i = 0; i < _size; i++)
+                var index = (hash + i) % _size;
+                if (_items[index] != null && _items[index].Key.Equals(key))
                 {
-                    if (_items[i] != null && _items[i].Key.Equals(key))
-                    {
-                        _items[i] = null;
-                        _keys.Remove(key);
-                        OnItemRemoved?.Invoke(key);
-                        return true;
-                    }
+                    _items[index] = null;
+                    _keys.Remove(key);
+                    OnItemRemoved?.Invoke(key);
+                    return true;
                 }
-
-                throw new InvalidOperationException($"$Key '{key}' not found.");
             }
 
-            if (_items[hash].Key.Equals(key))
-            {
-                _items[hash] = null;
-                _keys.Remove(key);
-                OnItemRemoved?.Invoke(key);
-                return true;
-            }
-            else
-            {
-                var placed = false;
-                for (var i = hash; i < _size; i++)
-                {
-                    if (_items[i] == null)
-                    {
-                        throw new InvalidOperationException($"$Key '{key}' not found.");
-                    }
-
-                    if (_items[i].Key.Equals(key))
-                    {
-                        _items[i] = null;
-                        _keys.Remove(key);
-                        OnItemRemoved?.Invoke(key);
-                        return true;
-                    }
-                }
-
-                if (!placed)
-                {
-                    for (var i = 0; i < hash; i++)
-                    {
-                        if (_items[i] == null)
-                        {
-                            throw new InvalidOperationException($"$Key '{key}' not found.");
-                        }
-
-                        if (_items[i].Key.Equals(key))
-                        {
-                            _items[i] = null;
-                            _keys.Remove(key);
-                            OnItemRemoved?.Invoke(key);
-                            return true;
-                        }
-                    }
-                }
-
-                throw new InvalidOperationException($"$Key '{key}' not found.");
-            }
+            throw new InvalidOperationException($"Key '{key}' not found.");
         }
+
 
 
         public bool TryGetValue(TKey key, out TValue value)
@@ -252,64 +139,23 @@ namespace MyLib
 
             if (!_keys.Contains(key))
             {
-                throw new InvalidOperationException($"$Key '{key}' not found.");
+                throw new InvalidOperationException($"Key '{key}' not found.");
             }
-            if (_items[hash] == null)
+
+            int index = hash;
+            while (_items[index] != null)
             {
-                foreach (var item in _items)
+                if (_items[index].Key.Equals(key))
                 {
-                    if (item != null && item.Key.Equals(key))
-                    {
-                        value = item.Value;
-                        return true;
-                    }
+                    value = _items[index].Value;
+                    return true;
                 }
-
-                throw new InvalidOperationException($"$Key '{key}' not found.");
+                index = (index + 1) % _size;
             }
 
-            if (_items[hash].Key.Equals(key))
-            {
-                value = _items[hash].Value;
-                return true;
-            }
-            else
-            {
-                var placed = false;
-                for (var i = hash; i < _size; i++)
-                {
-                    if (_items[i] == null)
-                    {
-                        throw new InvalidOperationException($"$Key '{key}' not found.");
-                    }
-
-                    if (_items[i].Key.Equals(key))
-                    {
-                        value = _items[i].Value;
-                        return true;
-                    }
-                }
-
-                if (!placed)
-                {
-                    for (var i = 0; i < hash; i++)
-                    {
-                        if (_items[i] == null)
-                        {
-                            throw new InvalidOperationException($"$Key '{key}' not found.");
-                        }
-
-                        if (_items[i].Key.Equals(key))
-                        {
-                            value = _items[i].Value;
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            throw new InvalidOperationException($"$Key '{key}' not found.");
+            throw new InvalidOperationException($"Key '{key}' not found.");
         }
+
 
 
         private int GetHash(TKey key)
@@ -427,7 +273,7 @@ namespace MyLib
 
             if (array.Length - arrayIndex < _keys.Count)
             {
-                throw new ArgumentException("The destination array is not large enough.");
+                throw new ArgumentException("The destination array is not large enough.", nameof(array));
             }
 
             int i = arrayIndex;
@@ -442,6 +288,7 @@ namespace MyLib
                 }
             }
         }
+
 
     }
 }

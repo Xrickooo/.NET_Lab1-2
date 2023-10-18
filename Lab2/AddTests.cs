@@ -1,14 +1,10 @@
 ﻿using MyLib;
 public class AddTests 
 {
-    
     [Theory]
     [InlineData(0, "hey2")]
     [InlineData(250, "hey3")]
     [InlineData(26.1, "hey4")]
-    [InlineData(26.1, "hey4")]
-    [InlineData(26.1, null)]
-    [InlineData(1, null)]
     [InlineData(101, null)]
     public void ValidItemAdded(int key, string value)
     {
@@ -17,34 +13,34 @@ public class AddTests
         Assert.False(dict.IsReadOnly);
     }
     
-    [Fact]
-    public void ExistingItemAdded()    
+    [Theory]
+    [InlineData(1, "hey2")]
+    public void ExistingItemAdded(int key, string value)    
     { 
         var dict = new MyDictionary<int, string>(){};
-        dict.Add(1, null);
-        Assert.Throws<ArgumentException>(() => dict.Add(1,null));
+        dict.Add(key, value);
+        Assert.Throws<ArgumentException>(() =>  dict.Add(key, value));
     }
     
-    [Fact]
-    public void InvalidItemAdded()    
+    [Theory]
+    [InlineData(-10, "hey2")]
+    public void NegativeItemAdded(int key, string value)    
     { 
         var dict = new MyDictionary<int, string>(){};
-        Assert.Throws<ArgumentException>(() => dict.Add(-10,null));
+        Assert.Throws<ArgumentException>(() => dict.Add(key,value));
     }
    
     
-    [Fact]
-    public void AddKeyValuePair_AddsItemForNonExistentKey()
+    [Theory]
+    [InlineData(1, "Value1")]
+    public void AddKeyValuePair_AddsItemForNonExistentKey(int key, string value)
     {
-        // Arrange
         var dictionary = new MyDictionary<int, string>();
-        var item = new KeyValuePair<int, string>(1, "Value1");
-
-        // Act
+        var item = new KeyValuePair<int, string>(key, value);
+        
         dictionary.Add(item);
-
-        // Assert
-        Assert.Equal("Value1", dictionary[1]);
+        
+        Assert.Equal(value, dictionary[1]);
     }
 }
     

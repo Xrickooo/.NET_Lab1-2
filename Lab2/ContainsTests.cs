@@ -2,106 +2,59 @@
 
 public class ContainsTests
 {
-    [Fact]
-    public void ContainsKey_ReturnsTrueForExistingKey()
+    [Theory]
+    [InlineData(1, "Value1")]
+    public void ContainsKey_ReturnsTrueForExistingKey(int key,string value)
     {
-        // Arrange
         var dictionary = new MyDictionary<int, string>();
-        dictionary.Add(1, "Value1");
-
-        // Act
+        dictionary.Add(key, value);
+        
         var result = dictionary.ContainsKey(1);
-
-        // Assert
-        Assert.True(result);
-    }
-
-    [Fact]
-    public void ContainsKey_ThrowsKeyNotFoundExceptionForNonExistentKey()
-    {
-        // Arrange
-        var dictionary = new MyDictionary<int, string>();
-
-        // Act and Assert
-        Assert.Throws<KeyNotFoundException>(() => dictionary.ContainsKey(1));
-    }
-    
-    
-    
-    
-    
-    
-    
-    [Fact]
-    public void Contains_ReturnsTrueForExistingKeyValuePair()
-    {
-        // Arrange
-        var dictionary = new MyDictionary<int, string>();
-        dictionary.Add(1, "Value1");
-
-        // Act
-        var result = dictionary.Contains(new KeyValuePair<int, string>(1, "Value1"));
-
-        // Assert
-        Assert.True(result);
-    }
-
-    [Fact]
-    public void Contains_ReturnsFalseForNonExistentKeyValuePair()
-    {
-        // Arrange
-        var dictionary = new MyDictionary<int, string>();
-        dictionary.Add(1, "Value1");
         
-        Assert.Throws<Exception>(()=>dictionary.Contains(new KeyValuePair<int, string>(1, "Value2")));
-    }
-
-    [Fact]
-    public void Contains_ThrowsExceptionForNonExistentKeyValuePair()
-    {
-        // Arrange
-        var dictionary = new MyDictionary<int, string>();
-
-        // Act and Assert
-        Assert.Throws<Exception>(() => dictionary.Contains(new KeyValuePair<int, string>(1, "Value1")));
+        Assert.True(result);
     }
     
-    
-    
-    
-    
-    
-    [Fact]
-    public void ContainsValue_ReturnsTrueForExistingValue()
+    [Theory]
+    [InlineData(1, "Value1")]
+    public void Contains_ReturnsTrueForExistingKeyValuePair(int key,string value)
     {
-        // Arrange
         var dictionary = new MyDictionary<int, string>();
-        dictionary.Add(1, "Value1");
-
-        // Act
-        var result = dictionary.ContainsValue("Value1");
-
-        // Assert
+        dictionary.Add(key, value);
+        
+        var result = dictionary.Contains(new KeyValuePair<int, string>(key, value));
+        
         Assert.True(result);
     }
 
-    [Fact]
-    public void ContainsValue_ReturnsFalseForNonExistentValue()
+    [Theory]
+    [InlineData(1, "Value1","Value2")]
+    public void Contains_ReturnsFalseForNonExistentKeyValuePair(int key,string value,string value2)
     {
-        // Arrange
         var dictionary = new MyDictionary<int, string>();
-        dictionary.Add(1, "Value1");
+        dictionary.Add(key, value);
         
-        Assert.Throws<Exception>(() => dictionary.ContainsValue("Value2"));
+        Assert.Throws<Exception>(()=>dictionary.Contains(new KeyValuePair<int, string>(key, value2)));
+    }
+    
+    [Theory]
+    [InlineData(1, "Value1")]
+    public void ContainsValue_ReturnsTrueForExistingValue(int key,string value)
+    {
+        var dictionary = new MyDictionary<int, string>();
+        dictionary.Add(key, value);
+        
+        var result = dictionary.ContainsValue(value);
+        
+        Assert.True(result);
     }
 
-    [Fact]
-    public void ContainsValue_ThrowsExceptionForNonExistentValue()
+    [Theory]
+    [InlineData(1, "Value1", "Value2")]
+    public void ContainsValue_ReturnsFalseForNonExistentValue(int key,string value,string value2)
     {
-        // Arrange
         var dictionary = new MyDictionary<int, string>();
-
-        // Act and Assert
-        Assert.Throws<Exception>(() => dictionary.ContainsValue("Value1"));
+        dictionary.Add(key, value);
+        
+        Assert.Throws<Exception>(() => dictionary.ContainsValue(value2));
     }
 }

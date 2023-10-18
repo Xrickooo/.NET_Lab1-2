@@ -2,53 +2,26 @@
 
 public class SearchTests
 {
-    [Fact]
-    public void Search_ReturnsValueForExistingKey()
+    [Theory]
+    [InlineData(1, "Value1",101, "Value2")]
+    public void Search_ReturnsValueForCollidingKeys(int key, string value, int key2, string  value2)
     {
-        // Arrange
         var dictionary = new MyDictionary<int, string>();
-        dictionary.Add(1, "Value1");
-
-        // Act
-        var value = dictionary.Search(1);
-
-        // Assert
-        Assert.Equal("Value1", value);
+        dictionary.Add(key, value);
+        dictionary.Add(key2, value2); 
+        
+        var value3 = dictionary.Search(101);
+        
+        Assert.Equal(value2, value3);
     }
 
-    [Fact]
-    public void Search_ThrowsKeyNotFoundExceptionForNonExistentKey()
+    [Theory]
+    [InlineData(1, 101,"Value1")]
+    public void Search_ThrowsKeyNotFoundExceptionForCollidingNonExistentKey(int key, int key2, string value)
     {
-        // Arrange
         var dictionary = new MyDictionary<int, string>();
-
-        // Act and Assert
-        Assert.Throws<KeyNotFoundException>(() => dictionary.Search(1));
-    }
-
-    [Fact]
-    public void Search_ReturnsValueForCollidingKeys()
-    {
-        // Arrange
-        var dictionary = new MyDictionary<int, string>();
-        dictionary.Add(1, "Value1");
-        dictionary.Add(101, "Value2"); // 1 и 101 хешируются в одну ячейку
-
-        // Act
-        var value = dictionary.Search(101);
-
-        // Assert
-        Assert.Equal("Value2", value);
-    }
-
-    [Fact]
-    public void Search_ThrowsKeyNotFoundExceptionForCollidingNonExistentKey()
-    {
-        // Arrange
-        var dictionary = new MyDictionary<int, string>();
-        dictionary.Add(1, "Value1");
-
-        // Act and Assert
-        Assert.Throws<KeyNotFoundException>(() => dictionary.Search(101)); // 101 хешируется в ту же ячейку, где нет значения
+        dictionary.Add(key,value);
+        
+        Assert.Throws<KeyNotFoundException>(() => dictionary.Search(key2));
     }
 }

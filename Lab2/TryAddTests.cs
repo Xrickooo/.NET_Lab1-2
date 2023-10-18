@@ -2,29 +2,26 @@
 
 public class TryAddTests
 {
-    [Fact]
-    public void TryAdd_AddsItemForNonExistentKey()
+    [Theory]
+    [InlineData(1, "Value1")]
+    public void TryAdd_AddsItemForNonExistentKey(int key, string value)
     {
-        // Arrange
         var dictionary = new MyDictionary<int, string>();
-        var item = new Item<int, string> { Key = 1, Value = "Value1" };
-
-        // Act
+        var item = new Item<int, string> { Key = key, Value = value };
+        
         dictionary.TryAdd(item);
-
-        // Assert
-        Assert.Equal("Value1", dictionary[1]);
+        
+        Assert.Equal(value, dictionary[key]);
     }
 
-    [Fact]
-    public void TryAdd_ThrowsExceptionForExistingKey()
+    [Theory]
+    [InlineData(1, "Value1","Value2")]
+    public void TryAdd_ThrowsExceptionForExistingKey(int key, string value,string value2)
     {
-        // Arrange
         var dictionary = new MyDictionary<int, string>();
-        dictionary.Add(1, "Value1");
-        var item = new Item<int, string> { Key = 1, Value = "Value2" }; // Попытка добавить существующий ключ
-
-        // Act and Assert
+        dictionary.Add(key,value);
+        var item = new Item<int, string> { Key = key, Value = value2 }; 
+        
         Assert.Throws<InvalidOperationException>(() => dictionary.TryAdd(item));
     }
 }

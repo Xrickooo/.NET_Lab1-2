@@ -2,19 +2,17 @@
 
 public class ValuesTests
 {
-    [Fact]
-    public void Values_ReturnsCorrectCollectionOfValues()
+    [Theory]
+    [InlineData(1, "Value1",2, "Value2",3, "Value3")]
+    public void Values_ReturnsCorrectCollectionOfValues(int key1, string value1,int key2, string value2,int key3, string value3)
     {
-        // Arrange
         var dictionary = new MyDictionary<int, string>();
-        dictionary.Add(1, "Value1");
-        dictionary.Add(2, "Value2");
-        dictionary.Add(3, "Value3");
-
-        // Act
+        dictionary.Add(key1, value1);
+        dictionary.Add(key2, value2);
+        dictionary.Add(key3, value3);
+        
         var values = dictionary.Values;
-
-        // Assert
-        Assert.Equal(new[] { "Value1", "Value2", "Value3" }, values);
+        
+        Assert.Equal(new[] { value1, value2, value3 }, values);
     }
 }

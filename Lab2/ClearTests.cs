@@ -8,14 +8,11 @@ public class ClearTests
     [InlineData(26.1, "hey4")]
     public void ClearDictionary(int key, string value)
     {
-        // Arrange
         var dictionary = new MyDictionary<int, string>();
         dictionary.Add(key,value);
-
-        // Act
+        
         dictionary.Clear();
-
-        // Assert
+        
         Assert.Empty(dictionary);
     }
 }
